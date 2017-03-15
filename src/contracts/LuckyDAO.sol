@@ -21,6 +21,10 @@ contract LuckyDAO is Mortal {
         secretHash = _secretHash;
     }
 
+    function computeSecret(uint _secretNum, address _address) constant returns (bytes32) {
+        return sha3(_secretNum, _address);
+    }
+
     function revealSecret(uint _secretNum) ownerOnly returns (bool){
         if(secretHash == sha3(_secretNum,msg.sender)){
             secretNum = _secretNum;
