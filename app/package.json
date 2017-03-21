@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.20.0",
+    "bcrypt": "^1.0.2",
+    "bignumber.js": "^4.0.0",
+    "crypto-js": "^3.1.9-1",
+    "eth-lightwallet": "^2.5.4",
+    "meteor-node-stubs": "~0.2.4",
+    "react": "^15.4.2",
+    "react-addons-css-transition-group": "^15.4.2",
+    "react-addons-pure-render-mixin": "^15.4.2",
+    "react-addons-transition-group": "^15.4.2",
+    "react-copy-to-clipboard": "^4.2.3",
+    "react-dom": "^15.4.2",
+    "react-md": "^1.0.1",
+    "react-router": "^3.0.2",
+    "solc": "^0.4.10",
+    "web3": "^0.18.2"
+  }
+}
