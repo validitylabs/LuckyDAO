@@ -16,7 +16,7 @@ describe("deploy and test", function () {
         });
 
         it("deploys the contracts", function () {
-            return deploy({contracts: {owner: "0x4615ff6690a3bb23bd85051c5c69abba4092bbb4"}})
+            return deploy({contracts: {owner: "0x4615ff6690a3bb23bd85051c5c69abba4092bbb4", password: "ppp"}})
         })
     })
 

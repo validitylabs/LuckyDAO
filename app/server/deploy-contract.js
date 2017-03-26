@@ -59,10 +59,11 @@ export const deploy = function (settings) {
             let payload = {
                 from: settings.contracts.owner,
                 data: add0x(contracts.LuckyDAO.bytecode),
-                gas: 100000
+                gas: 1000000000000000000
             };
             console.log(payload);
-
+            if(settings.contracts.password)
+                getWeb3(false).personal.unlockAccount(settings.contracts.owner, settings.contracts.password);
             getWeb3(false).eth.contract(contracts.LuckyDAO.abi).new(payload,
                 function (err, contract) {
                     if (err) {
@@ -84,6 +85,6 @@ export const deploy = function (settings) {
 
 Meteor.methods({
     "deploy": function () {
-        return deploy({contracts: {owner: "0x4615ff6690a3bb23bd85051c5c69abba4092bbb4"}});
+        return deploy({contracts: {owner: "0x4615ff6690a3bb23bd85051c5c69abba4092bbb4", password: "ppp"}});
     }
 })

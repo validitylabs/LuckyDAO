@@ -3,8 +3,8 @@
     "chain": "main",
     "password": "ppp"
   },
-  "ethNodeAddress": "https://localhost:8549",
-  "contractEvents": "http://localhost:8549",
+  "ethNodeAddress": "https://localhost:8548",
+  "contractEvents": "http://localhost:8548",
   "kadira": {
     "appId": "K52Z9zawP2CBxSKYt",
     "appSecret": "6ea66336-9041-4ec2-83d7-8bd5127cf79f"
