@@ -3,19 +3,16 @@
     "chain": "main",
     "password": "ppp"
   },
-  "ethNodeAddress": "https://localhost:8548",
-  "contractEvents": "http://localhost:8548",
-  "kadira": {
-    "appId": "K52Z9zawP2CBxSKYt",
-    "appSecret": "6ea66336-9041-4ec2-83d7-8bd5127cf79f"
-  },
+  "ethNodeAddress": "http://localhost:8585",
+  "contractEvents": "http://localhost:8585",
+  "appAddress": "0x4615ff6690a3bb23bd85051c5c69abba4092bbb4",
+  "alias": "server wallet",
+  "email": "lucky-dao@validitylabs.io",
+  "password": "really difficult to guess password for my mnemonic",
+  "mnemonic": "bonus salon bracket cancel farm foot face stomach gasp capital fee orchard",
+  "salt": "07uGdEJpZ+a6y0jvLe3KNRBooBD3pc7qp4rTFKaIICo=",
   "listeners": true,
-  "polling": false,
-  "ipfsNode": {
-    "host": "ipfs.infura.io",
-    "port": "5001",
-    "protocol": "https"
-  }
+  "polling": false
 }
 
 

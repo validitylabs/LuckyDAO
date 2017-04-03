@@ -1,0 +1,389 @@
+{
+  "contract_name": "LuckyDAO",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_participant",
+          "type": "address"
+        }
+      ],
+      "name": "getGuessCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "i",
+          "type": "uint256"
+        }
+      ],
+      "name": "getParticipant",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "redeemer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_secretNum",
+          "type": "uint256"
+        },
+        {
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "computeSecret",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "endTimeStamp",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_participant",
+          "type": "address"
+        },
+        {
+          "name": "i",
+          "type": "uint8"
+        }
+      ],
+      "name": "getGuess",
+      "outputs": [
+        {
+          "name": "floor",
+          "type": "uint256"
+        },
+        {
+          "name": "ceil",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "nbParticipants",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "environment",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_participant",
+          "type": "address"
+        }
+      ],
+      "name": "winProbability",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_participant",
+          "type": "address"
+        }
+      ],
+      "name": "isWinner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "redeem",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_endTimeStamp",
+          "type": "uint256"
+        }
+      ],
+      "name": "setEndTimeStamp",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "secret",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_endTimeStamp",
+          "type": "uint256"
+        },
+        {
+          "name": "_redeemer",
+          "type": "address"
+        },
+        {
+          "name": "_environment",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "payable": true,
+      "type": "fallback"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "participant",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "totalPaid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "floor",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "ceil",
+          "type": "uint256"
+        }
+      ],
+      "name": "NewGuess",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "secret",
+          "type": "uint256"
+        }
+      ],
+      "name": "GameClosed",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x606060405234610000576040516060806107778339810160409081528151602083015191909201515b6000805482919060ff191660018360028111610000570217905550600383905560048054600160a060020a031916600160a060020a0384161790555b5050505b610700806100776000396000f300606060405236156100a95763ffffffff60e060020a60003504166304b1142c81146102d15780631b9db2ef146103005780632ba29d381461032c5780632d0cb8a31461035557806351906bb0146103835780635d4453ba146103a2578063681e925a146103da57806374e2b63c146103f957806397df5028146104275780639d9ca28d14610452578063be040fb01461047f578063c456354e146104a0578063d1efd30d146104b2575b6102cf5b60006000600060025460001480156100c55750600034115b156101e657600160a060020a03331660009081526001602081905260409091209081015490935060ff1615156101355760068054600181019091556000908152600560205260409020805473ffffffffffffffffffffffffffffffffffffffff191633600160a060020a03161790555b6001838101805460ff19811660ff91821680850190921617909155600090815260208581526040918290203430600160a060020a03908116803183900384553195830195865560028901805483019081905583549654865133909316835294820192909252808501919091526060810194909452608084019190915290519093507f5e918ac75f38e38f7d8351285a01acb49239d7972c52a01c43d6759a684f7ebe9160a0908290030190a1610223565b60006002541180156101f85750600034115b1561022357604051600160a060020a033316903480156108fc02916000818181858888f19450505050505b5b600354421180156102355750600254155b156102c9576040805142815243804060208301526000198101408284015260011981014060608301526002198101406080830152600319014060a082015290519081900360c0019020600160a060020a033016319081156100005706600281905560408051918252517f71f4c9aec1b2c51302bcaf09a3f4985709759853536445493905081899603a219181900360200190a15b5b505050565b005b34610000576102ea600160a060020a03600435166104d1565b6040805160ff9092168252519081900360200190f35b34610000576103106004356104f7565b60408051600160a060020a039092168252519081900360200190f35b3461000057610310610515565b60408051600160a060020a039092168252519081900360200190f35b3461000057610371600435600160a060020a0360243516610524565b60408051918252519081900360200190f35b346100005761037161055b565b60408051918252519081900360200190f35b34610000576103c1600160a060020a036004351660ff60243516610561565b6040805192835260208301919091528051918290030190f35b3461000057610371610598565b60408051918252519081900360200190f35b346100005761040661059e565b6040518082600281116100005760ff16815260200191505060405180910390f35b3461000057610371600160a060020a03600435166105a7565b60408051918252519081900360200190f35b346100005761046b600160a060020a03600435166105de565b604080519115158252519081900360200190f35b346100005761046b610673565b604080519115158252519081900360200190f35b34610000576102cf6004356106ae565b005b34610000576103716106ce565b60408051918252519081900360200190f35b600160a060020a0381166000908152600160208190526040909120015460ff165b919050565b600081815260056020526040902054600160a060020a03165b919050565b600454600160a060020a031681565b604080518381526c01000000000000000000000000600160a060020a03841602602082015290519081900360340190205b92915050565b60035481565b600160a060020a038216600090815260016020818152604080842060ff86168552909152909120805491810154905b509250929050565b60065481565b60005460ff1681565b600160a060020a03818116600090815260016020526040812060020154909130163190620f4240028115610000570490505b919050565b600080805b600160a060020a0384166000908152600160208190526040909120015460ff90811690831610156106675750600160a060020a038316600090815260016020908152604080832060ff85168452909152902080546002541080159061064d57508060010154600254105b1561065b576001925061066c565b5b6001909101906105e3565b600092505b5050919050565b600254600090156106aa57600454604051600160a060020a039182169130163180156108fc02916000818181858888f19450505050505b5b90565b600260005460ff16600281116100005714156106ca5760038190555b5b50565b600254815600a165627a7a72305820ffb5f1413b848fbf7ba0375b7e47acab5d34b31fe2b5e91dd28a195f2b10e9620029",
+  "networks": {
+    "1490960143397": {
+      "events": {
+        "0x5e918ac75f38e38f7d8351285a01acb49239d7972c52a01c43d6759a684f7ebe": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "participant",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "totalPaid",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "floor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "ceil",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewGuess",
+          "type": "event"
+        },
+        "0x71f4c9aec1b2c51302bcaf09a3f4985709759853536445493905081899603a21": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "secret",
+              "type": "uint256"
+            }
+          ],
+          "name": "GameClosed",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xf1d5bd6986a6ce6b4fc519df8324b1fe9ab3a56c",
+      "updated_at": 1490960149784
+    },
+    "develop": {
+      "events": {
+        "0x5e918ac75f38e38f7d8351285a01acb49239d7972c52a01c43d6759a684f7ebe": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "participant",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "totalPaid",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "floor",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "ceil",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewGuess",
+          "type": "event"
+        },
+        "0x71f4c9aec1b2c51302bcaf09a3f4985709759853536445493905081899603a21": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "secret",
+              "type": "uint256"
+            }
+          ],
+          "name": "GameClosed",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xf1d5bd6986a6ce6b4fc519df8324b1fe9ab3a56c",
+      "updated_at": 1490960541136
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1490960541136
+}

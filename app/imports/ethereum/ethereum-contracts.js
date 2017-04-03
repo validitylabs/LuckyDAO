@@ -1,8 +1,10 @@
 import {Meteor} from "meteor/meteor";
 import {Promise} from "meteor/promise";
-import {getWeb3} from "./ethereum-services";
+import {ether, getWeb3, signAndSubmit} from "./ethereum-services";
 import {Mongo} from "meteor/mongo";
 import {Globals} from "../model/globals";
+import {txutils} from "eth-lightwallet";
+import BigNumber from "bignumber.js";
 
 /**
  * get the contract interface JSON from the project Assets (the private folder)
@@ -10,8 +12,11 @@ import {Globals} from "../model/globals";
  *
  * @returns {Promise that resolves with a JSON}
  */
-export const contractDefs = function () {
+export const contractDefs = function (name) {
     let contractDefs = Globals.findOne({name: "contractInterfaces"});
+    if(name){
+        return contractDefs.contracts[name];
+    }
     return contractDefs ? contractDefs.contracts : {};
 };
 
@@ -29,14 +34,147 @@ if (Meteor.isServer) {
 let contracts = {};
 export const getContract = (name) => {
     return new Promise((resolve, reject) => {
-        if (!contracts[name]) try {
-            contracts[name] = getWeb3(event).eth.contract(contractDefs[name].abi).at(contractDefs[name].address);
+        try {
+            let contractDef = contractDefs(name);
+            if (!contracts[name] && contractDef.address) {
+                contracts[name] = getWeb3().eth.contract(contractDef.abi).at(contractDef.address);
+            } else if (!contracts[name]) {
+                contracts[name] = getWeb3().eth.contract(contractDef.abi);
+            }
         } catch (err) {
             reject(err);
             return;
         }
         resolve(contracts[name]);
     });
+};
+
+const getNonce = function (address) {
+    /*the nonce is the count of the next transaction*/
+    return getWeb3().eth.getTransactionCount(address, "pending");
+};
+
+/**
+ * create an instance of the contract. the constructor parameters can be passed after the name
+ * @param name of the contract ot create
+ * @param sender
+ * @param password
+ */
+export const getInstance = (contractName, sender, password) => {
+    let web3 = getWeb3();
+    let gasPrice = web3.toHex(web3.eth.gasPrice);
+
+    return getContract(contractName)
+        .then((contract) => {
+            let args = Array.from(arguments).slice(3);
+            args.push({
+                data: contract.unlinked_binary
+            });
+            let payloadData = contract.new.getData.apply(this, args);
+            let gasEstimate = web3.toHex(web3.eth.estimateGas({
+                    value: web3.toHex(0),
+                    data: payloadData
+                }) + 10000);
+
+            let nonce = getNonce(sender);
+            console.log("the nonce is", nonce, "gas estimate", gasEstimate / 5);
+
+            var rawTx = {
+                nonce: nonce,
+                gasPrice: gasPrice,
+                gasLimit: gasEstimate,
+                from: sender,
+                value: web3.toHex(0),
+                data: payloadData,
+            };
+
+            let rawContractTx = txutils.createContractTx(sender, rawTx);
+
+            return {
+                rawTx: rawContractTx.tx,
+                transactionCost: new BigNumber(gasEstimate.toString()).times(gasPrice).dividedBy(ether).toNumber(),
+                accountBalance: web3.eth.getBalance(sender).dividedBy(ether).toNumber(),
+                address: rawContractTx.addr,
+            };
+        })
+        .then(function (txObject) {
+            if (password) {
+                return new Promise((resolve, reject) => {
+                    signAndSubmit(password, txObject.rawTx, sender, true).then(function () {
+                        resolve(txObject);
+                    }).catch((err) => {
+                        reject(err);
+                    })
+                });
+            } else {
+                return txObject;
+            }
+        })
+        .catch((err) => {
+            throw new Meteor.Error("create new instance of", contractName, err.message);
+        });
+};
+
+/**
+ * create a transaction for the contract method. If a password is passed, the transaction will be signed and
+ * the result will be returned. If no password is set, the raw TX will be returned
+ * @param contractName a string with the name of the contract
+ * @param funcName a string with the name of the function
+ * @param value the amount of Wei to send with the call (this is not gas)
+ * @param sender the address from which the TX should be sent
+ * @param password the password to use for unlocking the from account
+ */
+export const callContractTxMethod = function (contractName, funcName, value, sender, password) {
+    let web3 = getWeb3();
+    let gasPrice = web3.toHex(web3.eth.gasPrice);
+
+    return getContract(contractName)
+        .then((contract) => {
+            let args;
+            if(password)
+                args = Array.from(arguments).slice(5);
+            else
+                args = Array.from(arguments).slice(4);
+
+            let payloadData = contract[funcName].getData.apply(this, args);
+            let gasEstimate = web3.toHex(web3.eth.estimateGas({
+                    to: contract.address,
+                    value: web3.toHex(value),
+                    data: payloadData
+                }) * 3);
+
+            let nonce = getNonce(sender);
+            console.log("the nonce is", nonce, "gas estimate", gasEstimate / 5);
+
+            var rawTx = {
+                nonce: nonce,
+                gasPrice: gasPrice,
+                gasLimit: gasEstimate,
+                to: contract.address,
+                from: sender,
+                value: web3.toHex(value),
+                data: payloadData,
+            };
+
+            let rawTxString = txutils.functionTx(contract.abi, funcName, args, rawTx);
+
+            return {
+                rawTx: rawTxString,
+                transactionCost: new BigNumber(gasEstimate.toString()).times(gasPrice).dividedBy(ether).toNumber(),
+                accountBalance: web3.eth.getBalance(sender).dividedBy(ether).toNumber(),
+                recipient: contract.address,
+            };
+        })
+        .then(function (txObject) {
+            if (password) {
+                return signAndSubmit(password, txObject.rawTx, sender, true);
+            } else {
+                return txObject;
+            }
+        })
+        .catch((err) => {
+            throw new Meteor.Error("create function call for contract", contractName, funcName, err.message);
+        });
 };
 
 export const callContractMethod = function (contract, funcName) {

@@ -67,35 +67,71 @@ export const getWeb3 = (event) => {
     return w3;
 };
 
-export const signAndSubmit = (password, rawTx, waitForMining, sender, recipient) => {
+export const getBalance = (address) => {
+    return getWeb3().eth.getBalance(address).toString();
+}
+
+export const signAndSubmit = (password, rawTx, sender, waitForMining) => {
     return new Promise((resolve, reject) => {
-        wallet.keyFromPassword(password, (err, pwDerivedKey) => {
+        wallet.keyFromPassword(password, Meteor.bindEnvironment(function (err, pwDerivedKey) {
             if (err) {
                 reject(err);
                 return;
             }
-            let signedTxString = signing.signTx(wallet, pwDerivedKey, add0x(rawTx), add0x(Meteor.user().username));
-            return Meteor.callPromise('submit-raw-tx', add0x(signedTxString.toString('hex')))
-                .then((result) => {
-                    if (waitForMining) {
-                        return Meteor.callPromise('wait-for-tx-mining', result, sender, recipient)
-                            .then((result) => {
-                                resolve(result);
-                            });
+            resolve(signing.signTx(wallet, pwDerivedKey, add0x(rawTx), add0x(sender)));
+        }));
+    }).then(function (signedTxString) {
+        return submitRawTx(add0x(signedTxString.toString('hex')));
+    }).then(function (txHash) {
+        if (waitForMining) {
+            return new Promise((resolve, reject) => {
+                Meteor.call('wait-for-tx-mining', txHash, (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        reject(err);
                     } else {
-                        resolve(result);
+                        resolve(txHash);
                     }
-                })
-                .catch((err) => {
-                    console.log(err);
-                    reject(err);
-                })
-        });
+                });
+            })
+        } else {
+            return txHash;
+        }
+    }).catch(function (err) {
+        console.log(err);
     })
 };
 
+export const submitRawTx = function (rawTxHexString) {
+    var txHash = getWeb3().sha3(rawTxHexString, {encoding: 'hex'});
+    console.log("computed hash is", txHash);
+    return new Promise((resolve, reject) => {
+        if (!getWeb3().eth.getTransaction(txHash)) {
+            getWeb3().eth.sendRawTransaction(add0x(rawTxHexString), function (err, hash) {
+                console.log('transaction hash is', hash);
+                if (err) {
+                    reject(new Meteor.Error('web3-error', err.message));
+                } else {
+                    resolve(hash);
+                }
+            });
+        } else {
+            console.log("transaction already exists", txHash);
+            resolve(txHash);
+        }
+    })
+}
+
 let wallet = undefined;
 let pdk = undefined;
+
+export const getAddresses = () => {
+    if (wallet) {
+        return wallet.getAddresses();
+    }
+    return [];
+}
+
 export const createKeystore = (alias, email, password, salt, mnemonic) => {
     let _resolve;
     let _reject;
@@ -116,13 +152,14 @@ export const createKeystore = (alias, email, password, salt, mnemonic) => {
 
             let mnemonic = ks.getSeed(pwDerivedKey);
 
-            LocalStorage.setItem('encrypted-mnemonic', CryptoJS.AES.encrypt(mnemonic, password).toString());
-            LocalStorage.setItem('salt', ks.salt);
-            LocalStorage.setItem('alias', alias);
-            LocalStorage.setItem('email', email);
-            LocalStorage.setItem('pk', ks.exportPrivateKey(ks.getAddresses()[0], pwDerivedKey));
+            if (Meteor.isClient) {
+                LocalStorage.setItem('encrypted-mnemonic', CryptoJS.AES.encrypt(mnemonic, password).toString());
+                LocalStorage.setItem('salt', ks.salt);
+                LocalStorage.setItem('alias', alias);
+                LocalStorage.setItem('email', email);
 
-            LocalStorage.setItem('username', ks.getAddresses()[0]);
+                LocalStorage.setItem('username', ks.getAddresses()[0]);
+            }
 
             _resolve({
                 username: ks.getAddresses()[0],
@@ -191,5 +228,38 @@ export const isValidAddress = function (address) {
     address = add0x(address).toLowerCase();
 
     return (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address))
+};
+
+export const createRawValueTx = function (userId, recipient, value) {
+    return new Promise((resolve, reject) => {
+        let web3 = getWeb3();
+        let gasPrice = web3.toHex(web3.eth.gasPrice);
+        let profile = Profiles.findOne({owner: userId});
+
+        let gasEstimate = web3.toHex(web3.eth.estimateGas({
+            to: recipient,
+            value: web3.toHex(value),
+        }));
+
+        let nonce = getNonce(profile);
+        console.log("the nonce is", nonce);
+
+        var rawTx = {
+            nonce: nonce,
+            gasPrice: gasPrice,
+            gasLimit: gasEstimate,
+            to: recipient,
+            from: profile.address,
+            value: web3.toHex(value),
+        };
+
+        let rawTxString = txutils.valueTx(rawTx);
+
+        resolve({
+            rawTx: rawTxString,
+            transactionCost: new BigNumber(gasEstimate.toString()).times(gasPrice).dividedBy(ether).toNumber(),
+            accountBalance: web3.eth.getBalance(profile.address).dividedBy(ether).toNumber(),
+        });
+    })
 };
 

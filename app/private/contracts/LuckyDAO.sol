@@ -1,10 +1,6 @@
 pragma solidity ^0.4.8;
 
-
-import "./Mortal.sol";
-
-
-contract LuckyDAO is Mortal {
+contract LuckyDAO {
     enum Environment {UNDEFINED, PROD, TEST}
 
     Environment public environment;
@@ -21,6 +17,7 @@ contract LuckyDAO is Mortal {
     }
 
     event NewGuess(address participant, uint amount, uint totalPaid, uint floor, uint ceil);
+    event GameClosed(uint secret);
 
     mapping (address => Participation) participations;
 
@@ -81,7 +78,9 @@ contract LuckyDAO is Mortal {
     }
 
     function redeem() returns (bool) {
-        return redeemer.send(this.balance);
+        if(secret != 0){
+            return redeemer.send(this.balance);
+        }
     }
 
 /*Fallback function for the contract. send ETH to the contract to register*/
@@ -107,6 +106,8 @@ contract LuckyDAO is Mortal {
             , block.blockhash(block.number - 2)
             , block.blockhash(block.number - 3)
             , block.blockhash(block.number - 4))) % this.balance;
+
+            GameClosed(secret);
         }
     }
 
