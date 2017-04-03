@@ -2,6 +2,37 @@
 
 LuckyDAO to which subscribed users can send Ether in order to increase chances of winning something. The likelihood of winning increases proportional to the number of Ethers that the luckiDAO received from that address.
 
+## Development environment setup
+
+as the first step, clone this repo. We will refer to the location you cloned the repository to as `<project-folder`
+
+### Truffle
+
+In order to test and deploy the smart contracts in this project you need truffle-framework. The installation instructions can be found [here](http://truffleframework.com/docs/getting_started/installation)
+
+In short, make sure you have node 7 and npm 4 and run `npm install -g truffle`
+
+### Ethereum Test-RPC
+
+The fastest way to run contracts is to fake it. To this end we'll use [testrpc](https://github.com/ethereumjs/testrpc)
+
+same as above for the versions and then `npm install -g ethereumjs-testrpc`
+
+### Meteor
+
+This project has been developped with [meteor](https://www.meteor.com/) a great full stack javascript framework that has a lot of neat features. The main reason being the DDP (Distributed Data Protocol) which allows to use an efficient pub-sub paradigm for data.
+
+If you have not installed Meteor yet, you will need to [do so now](https://www.meteor.com/install) in order to execute this project locally.
+
+## Running a Lucky Game
+
+simply `cd <application-folder>` and execute `./migrate-and-run test` This will:
+
+* launch a test-rpc node with a predefined mnemonic
+* deploy the contracts to test-rpc
+* run the tests to verify nothing is broken
+* launch meteor and make the app available at `http://localhsot:8080`
+
 ## Layout
 
 ### Status page (landing page)
